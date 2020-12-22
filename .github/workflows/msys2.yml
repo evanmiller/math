@@ -1,0 +1,65 @@
+name: msys2
+on: [ push, pull_request ]
+jobs:
+  msys2:
+    runs-on: windows-latest
+    env:
+      ARGS: toolset=gcc address-model=64 cxxflags=-std=${{ matrix.standard }}
+      PATH: C:\msys64\usr\bin;%PATH%
+    strategy:
+      fail-fast: false
+      matrix:
+        standard: [ c++11 ]
+        suite: [ float128_tests ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Checkout main boost
+        run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
+      - name: Update tools/build
+        run: git submodule update --init tools/build
+        working-directory: ../boost-root
+      - name: Update tools/boost_install
+        run: git submodule update --init tools/boost_install
+        working-directory: ../boost-root
+      - name: Update libs/headers
+        run: git submodule update --init libs/headers
+        working-directory: ../boost-root
+      - name: Update libs/config
+        run: git submodule update --init libs/config
+        working-directory: ../boost-root
+      - name: Update libs/format
+        run: git submodule update --init libs/format
+        working-directory: ../boost-root
+      - name: Update libs/numeric
+        run: git submodule update --init libs/numeric
+        working-directory: ../boost-root
+      - name: Update libs/type_traits
+        run: git submodule update --init libs/type_traits
+        working-directory: ../boost-root
+      - name: Update libs/timer
+        run: git submodule update --init libs/timer
+        working-directory: ../boost-root
+      - name: Update tools/boostdep
+        run: git submodule update --init tools/boostdep
+        working-directory: ../boost-root
+      - name: Copy files
+        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\math
+        working-directory: ../boost-root
+      - name: Install deps
+        run: python tools/boostdep/depinst/depinst.py math
+        working-directory: ../boost-root
+      - name: Bootstrap
+        run: bootstrap
+        working-directory: ../boost-root
+      - name: Generate headers
+        run: b2 headers
+        working-directory: ../boost-root
+      - name: Config info install
+        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        working-directory: ../boost-root/libs/config/test
+      - name: Config info
+        run: config_info_travis
+        working-directory: ../boost-root/libs/config/test
+      - name: Test
+        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        working-directory: ../boost-root/libs/math/test
