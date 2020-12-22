@@ -7,7 +7,7 @@ jobs:
       run:
         shell: cmd
     env:
-      ARGS: toolset=clang address-model=64 cxxflags=-std=${{ matrix.standard }}
+      ARGS: toolset=gcc address-model=64 cxxflags=-std=${{ matrix.standard }}
     strategy:
       fail-fast: false
       matrix:
@@ -65,5 +65,3 @@ jobs:
       - name: Test
         run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
         working-directory: ../boost-root/libs/math/test
-        env:
-          PATH: C:\msys64\usr\bin;%PATH%
