@@ -3,18 +3,23 @@ on: [ push, pull_request ]
 jobs:
   linux:
     runs-on: ubuntu-latest
-    env:
-      TOOLSET: gcc
     strategy:
       matrix:
         compiler: [ g++-6 ]
-        standard: [ c++11 ]
-        suite: [ special_fun ]
+        toolset: [ gcc ]
+        standard: [ c++11, c++14, gnu++14 ]
+        suite: [ float128_tests ] # special_fun  distribution_tests, quadrature, float128_tests, misc, ../example/examples, ../tools ]
+        include:
+          - compiler: g++-8
+            standard: gnu++17
+          - compiler: clang++-6.0
+            standard: c++11
+            toolset: clang
     steps:
       - name: Add repository
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
-        run: sudo apt install g++-6 libgmp-dev libmpfr-dev libfftw3-dev
+        run: sudo apt install g++-6 g++-8 clang-6.0 libgmp-dev libmpfr-dev libfftw3-dev
       - uses: actions/checkout@v2
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
@@ -58,7 +63,7 @@ jobs:
         run: ./b2 headers
         working-directory: ../boost-root
       - name: Generate user config
-        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        run: 'echo "using ${{ matrix.toolset }} : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
       - name: Config info install
         run: ../../../b2 config_info_travis_install toolset=$TOOLSET
@@ -67,5 +72,5 @@ jobs:
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER
+        run: ../../../b2 -j3 toolset=${{ matrix.toolset }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER
         working-directory: ../boost-root/libs/math/test
