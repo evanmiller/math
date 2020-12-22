@@ -5,28 +5,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [ g++-10 ]
-        toolset: [ gcc ]
-        standard: [ c++11, c++14, c++17, c++20 ]
-        suite: [ float128_tests, special_fun, distribution_tests, misc ] #, quadrature, ../example/examples, ../tools ]
-        include:
-          - compiler: clang++-10
-            toolset: clang
-            standard: c++20
-            suite: float128_tests
-          - compiler: clang++-10
-            toolset: clang
-            standard: c++20
-            suite: special_fun
-          - compiler: clang++-10
-            toolset: clang
-            standard: c++20
-            suite: distribution_tests
-          - compiler: clang++-10
-            toolset: clang
-            standard: c++20
-            suite: misc
+        compiler: [ g++-10, clang++-10 ]
+        standard: [ c++11 ] # , c++14, c++17, c++20 ]
+        suite: [ float128_tests ] #, special_fun, distribution_tests, misc, quadrature, ../example/examples, ../tools ]
     steps:
+      - name: Set TOOLSET
+        run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
       - name: Add repository
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
       - name: Install packages
@@ -74,14 +58,14 @@ jobs:
         run: ./b2 headers
         working-directory: ../boost-root
       - name: Generate user config
-        run: 'echo "using ${{ matrix.toolset }} : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
       - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=${{ matrix.toolset }}
+        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
         working-directory: ../boost-root/libs/config/test
       - name: Config info
         run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ../../../b2 -j3 toolset=${{ matrix.toolset }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER
+        run: ../../../b2 -j3 toolset=$TOOLSET ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER
         working-directory: ../boost-root/libs/math/test
