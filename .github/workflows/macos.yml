@@ -3,6 +3,7 @@ on: [ push, pull_request ]
 jobs:
   macos:
     runs-on: macos-latest
+    strategy:
       fail-fast: false
       matrix:
         toolset: [ gcc, clang ]
