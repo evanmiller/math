@@ -5,16 +5,23 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        compiler: [ g++-6 ]
+        compiler: [ g++-6, g++-8 ]
         toolset: [ gcc ]
-        standard: [ c++11, c++14, gnu++14 ]
+        standard: [ c++11, c++14, gnu++14, c++1z ]
         suite: [ float128_tests ] # special_fun  distribution_tests, quadrature, float128_tests, misc, ../example/examples, ../tools ]
         include:
-          - compiler: g++-8
-            standard: gnu++17
           - compiler: clang++-6.0
-            standard: c++11
             toolset: clang
+            standard: c++11
+            suite: float128_tests
+          - compiler: clang++-6.0
+            toolset: clang
+            standard: c++11
+            suite: ../tools
+          - compiler: clang++-6.0
+            toolset: clang
+            standard: c++11
+            suite: ../example/examples
     steps:
       - name: Add repository
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
@@ -66,7 +73,7 @@ jobs:
         run: 'echo "using ${{ matrix.toolset }} : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }} ;" > ~/user-config.jam'
         working-directory: ../boost-root
       - name: Config info install
-        run: ../../../b2 config_info_travis_install toolset=$TOOLSET
+        run: ../../../b2 config_info_travis_install toolset=${{ matrix.toolset }}
         working-directory: ../boost-root/libs/config/test
       - name: Config info
         run: ./config_info_travis
