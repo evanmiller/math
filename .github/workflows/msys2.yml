@@ -5,7 +5,7 @@ jobs:
     runs-on: windows-latest
     env:
       ARGS: toolset=gcc address-model=64 cxxflags=-std=${{ matrix.standard }}
-      PATH: C:\msys64\usr\bin;%PATH%
+      PATH: %PATH%;C:\msys64\usr\bin
     strategy:
       fail-fast: false
       matrix:
