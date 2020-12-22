@@ -1,19 +1,13 @@
-name: windows
+name: macos
 on: [ push, pull_request ]
 jobs:
-  windows:
-    runs-on: windows-latest
-    defaults:
-      run:
-        shell: cmd
-    env:
-      ARGS: toolset=${{ matrix.toolset }} address-model=64 cxxstd=${{ matrix.standard }}
-    strategy:
+  macos:
+    runs-on: macos-latest
       fail-fast: false
       matrix:
-        toolset: [ gcc, msvc-14.2 ]
+        toolset: [ gcc, clang ]
         standard: [ 14, 17 ]
-        suite: [ float128_tests, special_fun, distribution_tests, misc, quadrature, ../example//examples, ../tools ]
+        suite: [ float128_tests ] #, special_fun, distribution_tests, misc, quadrature, ../example//examples, ../tools ]
     steps:
       - uses: actions/checkout@v2
       - name: Checkout main boost
@@ -46,23 +40,23 @@ jobs:
         run: git submodule update --init tools/boostdep
         working-directory: ../boost-root
       - name: Copy files
-        run: xcopy /s /e /q %GITHUB_WORKSPACE% libs\math
+        run: cp -r $GITHUB_WORKSPACE/* libs/math
         working-directory: ../boost-root
       - name: Install deps
         run: python tools/boostdep/depinst/depinst.py math
         working-directory: ../boost-root
       - name: Bootstrap
-        run: bootstrap
+        run: ./bootstrap.sh
         working-directory: ../boost-root
       - name: Generate headers
-        run: b2 headers
+        run: ./b2 headers
         working-directory: ../boost-root
       - name: Config info install
-        run: ..\..\..\b2 config_info_travis_install %ARGS%
+        run: ../../../b2 config_info_travis_install toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }}
         working-directory: ../boost-root/libs/config/test
       - name: Config info
-        run: config_info_travis
+        run: ./config_info_travis
         working-directory: ../boost-root/libs/config/test
       - name: Test
-        run: ..\..\..\b2 -j3 --hash %ARGS% define=CI_SUPPRESS_KNOWN_ISSUES ${{ matrix.suite }}
+        run: ../../../b2 -j3 toolset=${{ matrix.toolset }} cxxstd=${{ matrix.standard }} ${{ matrix.suite }} define=CI_SUPPRESS_KNOWN_ISSUES define=SLOW_COMPILER
         working-directory: ../boost-root/libs/math/test
