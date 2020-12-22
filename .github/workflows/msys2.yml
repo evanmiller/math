@@ -7,7 +7,7 @@ jobs:
       run:
         shell: cmd
     env:
-      ARGS: toolset=gcc address-model=64 cxxflags=-std=${{ matrix.standard }}
+      ARGS: toolset=clang address-model=64 cxxflags=-std=${{ matrix.standard }}
     strategy:
       fail-fast: false
       matrix:
