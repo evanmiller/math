@@ -6,8 +6,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolset: [ gcc, clang ]
-        standard: [ 14, 17 ]
+        toolset: [ clang ]
+        standard: [ 11, 14, 17, 2a ]
         suite: [ float128_tests ] #, special_fun, distribution_tests, misc, quadrature, ../example//examples, ../tools ]
     steps:
       - uses: actions/checkout@v2
