@@ -4,6 +4,7 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         compiler: [ g++-10, clang++-10 ]
         standard: [ c++11, c++14, c++17, c++20 ]
