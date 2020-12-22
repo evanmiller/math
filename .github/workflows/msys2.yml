@@ -3,7 +3,9 @@ on: [ push, pull_request ]
 jobs:
   msys2:
     runs-on: windows-latest
-    shell: cmd
+    defaults:
+      run:
+        shell: cmd
     env:
       ARGS: toolset=gcc address-model=64 cxxflags=-std=${{ matrix.standard }}
     strategy:
