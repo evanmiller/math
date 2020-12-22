@@ -8,7 +8,7 @@ jobs:
         compiler: [ g++-6, g++-8 ]
         toolset: [ gcc ]
         standard: [ c++11, c++14, gnu++14, c++1z ]
-        suite: [ float128_tests ] # special_fun  distribution_tests, quadrature, float128_tests, misc, ../example/examples, ../tools ]
+        suite: [ float128_tests, special_fun, distribution_tests ] #, quadrature, misc, ../example/examples, ../tools ]
         include:
           - compiler: clang++-6.0
             toolset: clang
@@ -17,11 +17,11 @@ jobs:
           - compiler: clang++-6.0
             toolset: clang
             standard: c++11
-            suite: ../tools
+            suite: special_fun
           - compiler: clang++-6.0
             toolset: clang
             standard: c++11
-            suite: ../example/examples
+            suite: distribution_tests
     steps:
       - name: Add repository
         run: sudo apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
