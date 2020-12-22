@@ -6,8 +6,8 @@ jobs:
     strategy:
       matrix:
         compiler: [ g++-10, clang++-10 ]
-        standard: [ c++11 ] # , c++14, c++17, c++20 ]
-        suite: [ float128_tests ] #, special_fun, distribution_tests, misc, quadrature, ../example/examples, ../tools ]
+        standard: [ c++11, c++14, c++17, c++20 ]
+        suite: [ float128_tests, special_fun, distribution_tests, misc, quadrature, ../example//examples, ../tools ]
     steps:
       - name: Set TOOLSET
         run: echo ${{ matrix.compiler }} | awk '/^g/ { print "TOOLSET=gcc" } /^clang/ { print "TOOLSET=clang" }' >> $GITHUB_ENV
