@@ -19,7 +19,7 @@ jobs:
       - name: Checkout main boost
         run: git clone -b develop --depth 1 https://github.com/boostorg/boost.git ../boost-root
       - name: Update tools/build
-        run: git submodule update --init tools/build
+        run: echo $PWD && ls */* && git submodule update --init tools/build
         working-directory: $GITHUB_WORKSPACE/../boost-root
       - name: Update tools/boost_install
         run: git submodule update --init tools/boost_install
