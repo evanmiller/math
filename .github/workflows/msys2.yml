@@ -13,7 +13,7 @@ jobs:
       matrix:
         toolset: [ gcc, msvc-14.2 ]
         standard: [ 14, 17 ]
-        suite: [ float128_tests ] # , special_fun, distribution_tests, misc, quadrature, ../example//examples, ../tools ]
+        suite: [ float128_tests, special_fun, distribution_tests, misc, quadrature, ../example//examples, ../tools ]
     steps:
       - uses: actions/checkout@v2
       - name: Checkout main boost
