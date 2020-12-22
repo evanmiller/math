@@ -47,7 +47,7 @@ jobs:
       - name: Generate headers
         run: ./b2 headers
       - name: Generate user config
-        run: echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }};" > ~/user-config.jam
+        run: 'echo "using $TOOLSET : : ${{ matrix.compiler }} : <cxxflags>-std=${{ matrix.standard }};" > ~/user-config.jam'
       - name: Config info
         run: (cd libs/config/test && ../../../b2 config_info_travis_install toolset=$TOOLSET && ./config_info_travis)
       - name: Test
